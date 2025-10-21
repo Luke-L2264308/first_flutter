@@ -1,7 +1,34 @@
 import 'package:flutter/material.dart';
 
+// Here are the most commonly used Material widgets and a short explanation of what each does:
+
+// MaterialApp — top-level app container: routing, theme, localization, home widget.
+// Scaffold — basic visual layout structure: appBar, body, floatingActionButton, drawer, bottomBar.
+// AppBar — toolbar at top of Scaffold (title, actions, leading).
+// Center — centers a single child in its parent.
+// Column / Row — vertical / horizontal layout of multiple children.
+// Container — convenience widget for size, padding, margin, color, decoration.
+// Padding — applies inner spacing around a child.
+// SizedBox — fixed-size spacer or constrains a child’s size.
+// Expanded / Flexible — lets a child grow (flex) inside Row/Column.
+// Stack — overlap children; use Positioned for absolute placement.
+// Align — positions a child within itself using alignment.
+// Text — displays a string with styling.
+// Icon / IconButton — shows an icon; IconButton is tappable.
+// Image — displays images (asset, network, file, memory).
+// ElevatedButton / TextButton / OutlinedButton — common button styles for actions.
+// FloatingActionButton — circular primary action button, usually in Scaffold.floatingActionButton.
+// TextField / TextFormField — single-line/multi-line text input and form support.
+// ListView — scrollable linear list of children (builder for large lists).
+// ListTile — common row layout for lists (leading, title, subtitle, trailing).
+// Card — material-styled surface with elevation and rounded corners.
+// SnackBar — transient message shown by ScaffoldMessenger.
+// Dialog / AlertDialog — modal dialogs for confirmation/input.
+// InkWell / GestureDetector — detect taps/gestures; InkWell adds ripple effect.
+// BottomNavigationBar — bottom tab navigation control.
+// TabBar / TabBarView — top tabs with swipable content.
 void main() {
-  runApp(const MyApp());
+  // runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
