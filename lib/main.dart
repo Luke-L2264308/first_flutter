@@ -12,17 +12,20 @@ class App extends StatelessWidget {
     Container sandwichContainer = Container(
         margin: const EdgeInsets.all(10.0),
         width: 300.0,
-        height: 300.0,
+        height: 100.0,
         color: Colors.red,
         alignment: Alignment.center,
         child: OrderItemDisplay(5, 'Footlong'));
+    List<Container> list = [];
 
+    for (int i = 0; i < 20; i++) {
+      list.add(sandwichContainer);
+    }
     return MaterialApp(
       title: 'Sandwich Shop App',
       home: Scaffold(
-        appBar: AppBar(title: const Text('Sandwich Counter')),
-        body: Row(children: [sandwichContainer,sandwichContainer,sandwichContainer]),
-      ),
+          appBar: AppBar(title: const Text('Sandwich Counter')),
+          body: SingleChildScrollView(child:Column(children: list))),
     );
   }
 }
@@ -35,6 +38,8 @@ class OrderItemDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(style: TextStyle(color: Colors.yellow,fontSize: 20),'$quantity $itemType sandwich(es): ${'🥪' * quantity}');
+    return Text(
+        style: TextStyle(color: Colors.yellow, fontSize: 20),
+        '$quantity $itemType sandwich(es): ${'🥪' * quantity}');
   }
 }
