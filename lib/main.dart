@@ -16,16 +16,16 @@ class App extends StatelessWidget {
         color: Colors.red,
         alignment: Alignment.center,
         child: OrderItemDisplay(5, 'Footlong'));
-    List<Container> list = [];
+    // List<Container> list = [];
 
-    for (int i = 0; i < 20; i++) {
-      list.add(sandwichContainer);
-    }
+    // for (int i = 0; i < 20; i++) {
+    //   list.add(sandwichContainer);
+    // }
     return MaterialApp(
       title: 'Sandwich Shop App',
       home: Scaffold(
           appBar: AppBar(title: const Text('Sandwich Counter')),
-          body: SingleChildScrollView(child:Column(children: list))),
+            body: Center(child: sandwichContainer)),
     );
   }
 }
