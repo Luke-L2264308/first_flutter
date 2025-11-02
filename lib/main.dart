@@ -9,44 +9,10 @@ class App extends StatelessWidget {
   const App({super.key});
   @override
   Widget build(BuildContext context) {
-    Container sandwichContainer = Container(
-        margin: const EdgeInsets.all(10.0),
-        width: 300.0,
-        height: 100.0,
-        color: Colors.red,
-        alignment: Alignment.center,
-        child: OrderItemDisplay(5, 'Footlong'));
-    // List<Container> list = [];
-
-    // for (int i = 0; i < 20; i++) {
-    //   list.add(sandwichContainer);
-    // }
-    return MaterialApp(
-        title: 'Sandwich Shop App',
-        home: Scaffold(
-            appBar: AppBar(title: const Text('Sandwich Counter')),
-            // The bit that you need to update starts from here
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const OrderItemDisplay(5, 'Footlong'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () => print('Add button pressed!'),
-                        child: const Text('Add'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () => print('Remove button pressed!'),
-                        child: const Text('Remove'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            )));
+    return const MaterialApp(
+      title: 'Sandwich Shop App',
+      home: OrderScreen(maxQuantity: 5),
+    );
   }
 }
 class OrderScreen extends StatefulWidget {
@@ -93,7 +59,7 @@ class _OrderScreenState extends State<OrderScreen> {
         ],
       ),
     ),
-  );;
+  );
   }
 }
 class OrderItemDisplay extends StatelessWidget {
