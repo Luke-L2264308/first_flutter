@@ -4,12 +4,12 @@ void main() {
   runApp(const App());
 }
 
-// A class to model our sandwich data
+// The Sandwich class now tracks quantity
 class Sandwich {
-  final String id;
-  final String notes;
+  String notes;
+  int quantity;
 
-  Sandwich({required this.id, required this.notes});
+  Sandwich({required this.notes, this.quantity = 1});
 }
 
 class App extends StatelessWidget {
@@ -18,7 +18,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Sandwich Shop App',
-      home: OrderScreen(maxQuantity: 10), // Set max sandwiches
+      home: OrderScreen(maxQuantity: 10), // Set max total sandwiches
     );
   }
 }
@@ -37,43 +37,78 @@ class OrderScreen extends StatefulWidget {
 class _OrderScreenState extends State<OrderScreen> {
   final _notesController = TextEditingController();
 
-  // Manage a list of Sandwich objects instead of a single quantity
+  // Manage a list of grouped Sandwich objects
   final List<Sandwich> _sandwiches = [];
 
-  void _addSandwich() {
-    if (_sandwiches.length < widget.maxQuantity) {
-      setState(() {
-        // Create a new sandwich with a unique ID and the current notes
-        final newSandwich = Sandwich(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          notes: _notesController.text.isNotEmpty ? _notesController.text : 'No notes',
-        );
-        _sandwiches.add(newSandwich);
-      });
-      // Clear the text field for the next sandwich
-      _notesController.clear();
-
-      // Show a confirmation message
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sandwich added to your order!')),
-      );
-    } else {
-      // Show a message if the maximum quantity is reached
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                'You have reached the maximum of ${widget.maxQuantity} sandwiches.')),
-      );
-    }
+  // Helper to calculate the total number of all sandwiches
+  int get _totalSandwichCount {
+    return _sandwiches.fold<int>(0, (sum, item) => sum + item.quantity);
   }
 
-  // Method to remove a specific sandwich by its ID
-  void _removeSandwich(String id) {
+  // Adds a sandwich or increments the quantity if the notes match an existing item
+  void _addSandwich() {
+    if (_totalSandwichCount >= widget.maxQuantity) {
+      _showMaxQuantityReached();
+      return;
+    }
+
+    final notes = _notesController.text.isNotEmpty ? _notesController.text : 'No notes';
+
     setState(() {
-      _sandwiches.removeWhere((sandwich) => sandwich.id == id);
+      final index = _sandwiches.indexWhere((sandwich) => sandwich.notes == notes);
+
+      if (index != -1) {
+        // A sandwich with these notes already exists, so just increase its quantity.
+        _sandwiches[index].quantity++;
+      } else {
+        // This is a new type of sandwich, add it to the list.
+        _sandwiches.add(Sandwich(notes: notes, quantity: 1));
+      }
     });
+
+    _notesController.clear();
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Sandwich added to your order!')),
+    );
+  }
+
+  // Increments the quantity of an item directly from the list
+  void _incrementItem(String notes) {
+    if (_totalSandwichCount >= widget.maxQuantity) {
+      _showMaxQuantityReached();
+      return;
+    }
+    setState(() {
+      final index = _sandwiches.indexWhere((s) => s.notes == notes);
+      if (index != -1) {
+        _sandwiches[index].quantity++;
+      }
+    });
+  }
+
+  // Decrements the quantity of an item or removes it if the quantity is 1
+  void _decrementItem(String notes) {
+    setState(() {
+      final index = _sandwiches.indexWhere((s) => s.notes == notes);
+      if (index != -1) {
+        if (_sandwiches[index].quantity > 1) {
+          _sandwiches[index].quantity--;
+        } else {
+          // If quantity is 1, remove the item completely.
+          _sandwiches.removeAt(index);
+        }
+      }
+    });
+  }
+
+  void _showMaxQuantityReached() {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          content: Text(
+              'You have reached the maximum of ${widget.maxQuantity} sandwiches.')),
+    );
   }
 
   @override
@@ -86,12 +121,11 @@ class _OrderScreenState extends State<OrderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // The title now shows the number of sandwiches in the list
-        title: Text('Your Order (${_sandwiches.length})'),
+        // The title now shows the total number of sandwiches
+        title: Text('Your Order ($_totalSandwichCount)'),
       ),
       body: Column(
         children: <Widget>[
-          // Use an Expanded ListView to show the list of sandwiches
           Expanded(
             child: _sandwiches.isEmpty
                 ? const Center(child: Text('Add a sandwich to get started! 🥪'))
@@ -105,16 +139,26 @@ class _OrderScreenState extends State<OrderScreen> {
                           leading: const Text('🥪', style: TextStyle(fontSize: 24)),
                           title: const Text('Footlong Sandwich'),
                           subtitle: Text('Notes: ${sandwich.notes}'),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () => _removeSandwich(sandwich.id),
+                          // New controls to increment/decrement quantity
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.remove_circle_outline),
+                                onPressed: () => _decrementItem(sandwich.notes),
+                              ),
+                              Text('${sandwich.quantity}', style: Theme.of(context).textTheme.titleMedium),
+                              IconButton(
+                                icon: const Icon(Icons.add_circle_outline),
+                                onPressed: () => _incrementItem(sandwich.notes),
+                              ),
+                            ],
                           ),
                         ),
                       );
                     },
                   ),
           ),
-          // Controls for adding a new sandwich
           Padding(
             padding: const EdgeInsets.all(12.0),
             child: Column(
@@ -125,6 +169,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     border: OutlineInputBorder(),
                     labelText: 'Add notes for your sandwich...',
                   ),
+                  onSubmitted: (_) => _addSandwich(), // Allow submitting with enter key
                 ),
                 const SizedBox(height: 8),
                 SizedBox(
