@@ -28,10 +28,30 @@ class OrderScreen extends StatefulWidget {
 }
 
 class _OrderScreenState extends State<OrderScreen> {
+  // 1. Create a TextEditingController to get the text from the TextField.
+  final _notesController = TextEditingController();
+
+  // 2. Create a variable to hold the saved text.
+  String _savedSandwichContents = '';
+
   int _quantity = 0;
+
   void _increaseQuantity() {
     if (_quantity < widget.maxQuantity) {
-      setState(() => _quantity++);
+      setState(() {
+        _quantity++;
+        // 3. When the "Add" button is pressed, save the text from the controller.
+        _savedSandwichContents = _notesController.text;
+      });
+
+      // You can also show a quick message to confirm it was saved.
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'Added sandwich. Notes saved: "$_savedSandwichContents"'),
+        ),
+      );
     }
   }
 
@@ -39,6 +59,13 @@ class _OrderScreenState extends State<OrderScreen> {
     if (_quantity > 0) {
       setState(() => _quantity--);
     }
+  }
+
+  // 4. Remember to dispose of the controller when it's no longer needed.
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
   }
 
   @override
@@ -55,25 +82,33 @@ class _OrderScreenState extends State<OrderScreen> {
               _quantity,
               'Footlong',
             ),
+            // Optional: Display the saved contents to see it working.
+            if (_savedSandwichContents.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text('Current Notes: $_savedSandwichContents'),
+              ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: () => _increaseQuantity(),
+                  onPressed: _increaseQuantity, // This now also saves the notes
                   child: const Text('Add'),
                 ),
                 ElevatedButton(
-                  onPressed: () => _decreaseQuantity(),
+                  onPressed: _decreaseQuantity,
                   child: const Text('Remove'),
                 ),
               ],
             ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
+            Padding( // 5. Remove 'const' from Padding
+              padding: const EdgeInsets.all(8.0),
               child: TextField(
-                decoration: InputDecoration(
+                // 6. Assign the controller to the TextField.
+                controller: _notesController,
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'Order notes',
+                  labelText: 'Order notes (e.g., no onions)',
                 ),
               ),
             )
@@ -93,7 +128,7 @@ class OrderItemDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-        style: TextStyle(color: Colors.black, fontSize: 20),
+        style: const TextStyle(color: Colors.black, fontSize: 20),
         '$quantity $itemType sandwich(es): ${'🥪' * quantity}');
   }
 }
