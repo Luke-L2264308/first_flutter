@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  // runApp(const MyApp());
   runApp(const App());
+}
+
+// A class to model our sandwich data
+class Sandwich {
+  final String id;
+  final String notes;
+
+  Sandwich({required this.id, required this.notes});
 }
 
 class App extends StatelessWidget {
@@ -11,7 +18,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Sandwich Shop App',
-      home: OrderScreen(maxQuantity: 5),
+      home: OrderScreen(maxQuantity: 10), // Set max sandwiches
     );
   }
 }
@@ -28,40 +35,47 @@ class OrderScreen extends StatefulWidget {
 }
 
 class _OrderScreenState extends State<OrderScreen> {
-  // 1. Create a TextEditingController to get the text from the TextField.
   final _notesController = TextEditingController();
 
-  // 2. Create a variable to hold the saved text.
-  String _savedSandwichContents = '';
+  // Manage a list of Sandwich objects instead of a single quantity
+  final List<Sandwich> _sandwiches = [];
 
-  int _quantity = 0;
-
-  void _increaseQuantity() {
-    if (_quantity < widget.maxQuantity) {
+  void _addSandwich() {
+    if (_sandwiches.length < widget.maxQuantity) {
       setState(() {
-        _quantity++;
-        // 3. When the "Add" button is pressed, save the text from the controller.
-        _savedSandwichContents = _notesController.text;
+        // Create a new sandwich with a unique ID and the current notes
+        final newSandwich = Sandwich(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          notes: _notesController.text.isNotEmpty ? _notesController.text : 'No notes',
+        );
+        _sandwiches.add(newSandwich);
       });
+      // Clear the text field for the next sandwich
+      _notesController.clear();
 
-      // You can also show a quick message to confirm it was saved.
+      // Show a confirmation message
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sandwich added to your order!')),
+      );
+    } else {
+      // Show a message if the maximum quantity is reached
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-              'Added sandwich. Notes saved: "$_savedSandwichContents"'),
-        ),
+            content: Text(
+                'You have reached the maximum of ${widget.maxQuantity} sandwiches.')),
       );
     }
   }
 
-  void _decreaseQuantity() {
-    if (_quantity > 0) {
-      setState(() => _quantity--);
-    }
+  // Method to remove a specific sandwich by its ID
+  void _removeSandwich(String id) {
+    setState(() {
+      _sandwiches.removeWhere((sandwich) => sandwich.id == id);
+    });
   }
 
-  // 4. Remember to dispose of the controller when it's no longer needed.
   @override
   void dispose() {
     _notesController.dispose();
@@ -72,63 +86,63 @@ class _OrderScreenState extends State<OrderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sandwich Counter'),
+        // The title now shows the number of sandwiches in the list
+        title: Text('Your Order (${_sandwiches.length})'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            OrderItemDisplay(
-              _quantity,
-              'Footlong',
-            ),
-            // Optional: Display the saved contents to see it working.
-            if (_savedSandwichContents.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text('Current Notes: $_savedSandwichContents'),
-              ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+      body: Column(
+        children: <Widget>[
+          // Use an Expanded ListView to show the list of sandwiches
+          Expanded(
+            child: _sandwiches.isEmpty
+                ? const Center(child: Text('Add a sandwich to get started! 🥪'))
+                : ListView.builder(
+                    itemCount: _sandwiches.length,
+                    itemBuilder: (context, index) {
+                      final sandwich = _sandwiches[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                        child: ListTile(
+                          leading: const Text('🥪', style: TextStyle(fontSize: 24)),
+                          title: const Text('Footlong Sandwich'),
+                          subtitle: Text('Notes: ${sandwich.notes}'),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _removeSandwich(sandwich.id),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+          // Controls for adding a new sandwich
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
               children: [
-                ElevatedButton(
-                  onPressed: _increaseQuantity, // This now also saves the notes
-                  child: const Text('Add'),
+                TextField(
+                  controller: _notesController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Add notes for your sandwich...',
+                  ),
                 ),
-                ElevatedButton(
-                  onPressed: _decreaseQuantity,
-                  child: const Text('Remove'),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.add),
+                    onPressed: _addSandwich,
+                    label: const Text('Add Sandwich'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
                 ),
               ],
             ),
-            Padding( // 5. Remove 'const' from Padding
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                // 6. Assign the controller to the TextField.
-                controller: _notesController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Order notes (e.g., no onions)',
-                ),
-              ),
-            )
-          ],
-        ),
+          )
+        ],
       ),
     );
-  }
-}
-
-class OrderItemDisplay extends StatelessWidget {
-  final String itemType;
-  final int quantity;
-
-  const OrderItemDisplay(this.quantity, this.itemType, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-        style: const TextStyle(color: Colors.black, fontSize: 20),
-        '$quantity $itemType sandwich(es): ${'🥪' * quantity}');
   }
 }
