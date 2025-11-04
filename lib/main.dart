@@ -90,15 +90,8 @@ class _OrderScreenState extends State<OrderScreen> {
                 ),
               ],
             ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Order notes',
-                ),
-              ),
-            )
+            
+            
           ],
         ),
       ),
