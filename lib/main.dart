@@ -80,12 +80,12 @@ class _OrderScreenState extends State<OrderScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: StylisedButton(
-                    onPressed: _increaseQuantity,
+                    onPressed: _quantity < widget.maxQuantity ? _increaseQuantity : null,
                     child: const Text('Add'),
                   ),
                 ),
                 StylisedButton(
-                  onPressed: _decreaseQuantity,
+                  onPressed: _quantity>0 ? _decreaseQuantity : null,
                   child: const Text('Remove'),
                 ),
               ],
