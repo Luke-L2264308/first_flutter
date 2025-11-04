@@ -16,11 +16,11 @@ class App extends StatelessWidget {
   }
 }
 
-class StylisedButton extends StatelessWidget{
+class StylisedButton extends StatelessWidget {
   const StylisedButton({super.key, this.onPressed, this.child});
   final VoidCallback? onPressed;
   final Widget? child;
-  
+
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
@@ -28,8 +28,8 @@ class StylisedButton extends StatelessWidget{
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.red,
         foregroundColor: Colors.white,
-      )
-      ,child: child,
+      ),
+      child: child,
     );
   }
 }
@@ -42,23 +42,33 @@ class OrderScreen extends StatefulWidget {
   @override
   State<OrderScreen> createState() {
     return _OrderScreenState();
-    
   }
 }
 
 class _OrderScreenState extends State<OrderScreen> {
   int _quantity = 0;
+  String _itemType = '6 inch';
   void _increaseQuantity() {
-    if (_quantity < widget.maxQuantity) { // Methods are typically private (_increaseQuantity, _decreaseQuantity) in Flutter to manage internal state.
+    if (_quantity < widget.maxQuantity) {
+      // Methods are typically private (_increaseQuantity, _decreaseQuantity) in Flutter to manage internal state.
       setState(() => _quantity++);
     }
   }
 
   void _decreaseQuantity() {
-    if (_quantity > 0) { // To access them outside the class, you would need to make them public (remove the leading underscore).
+    if (_quantity > 0) {
+      // To access them outside the class, you would need to make them public (remove the leading underscore).
       setState(() => _quantity--);
     } // However, a more idiomatic Flutter approach is to expose callbacks or use state management solutions for interaction between widgets.
   }
+
+  void _makeFootLong() {
+    setState(() => _itemType = 'Footlong');
+  }
+  void _makeSixInch() {
+    setState(() => _itemType = 'Six inch');
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +82,7 @@ class _OrderScreenState extends State<OrderScreen> {
           children: <Widget>[
             OrderItemDisplay(
               _quantity,
-              'Footlong',
+              _itemType,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -80,18 +90,33 @@ class _OrderScreenState extends State<OrderScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: StylisedButton(
-                    onPressed: _quantity < widget.maxQuantity ? _increaseQuantity : null,
+                    onPressed: _quantity < widget.maxQuantity
+                        ? _increaseQuantity
+                        : null,
                     child: const Text('Add'),
                   ),
                 ),
                 StylisedButton(
-                  onPressed: _quantity>0 ? _decreaseQuantity : null,
+                  onPressed: _quantity > 0 ? _decreaseQuantity : null,
                   child: const Text('Remove'),
                 ),
+                
               ],
             ),
-            
-            
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [Text('What Type of Sandwich do you want')]),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                OutlinedButton(
+                    onPressed: _makeFootLong, child: const Text('Footlong')),
+              OutlinedButton(
+                    onPressed: _makeSixInch, child: const Text('Six inch'))],
+            )
           ],
         ),
       ),
