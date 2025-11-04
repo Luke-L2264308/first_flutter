@@ -45,9 +45,20 @@ class OrderScreen extends StatefulWidget {
   }
 }
 
+enum BreadType {
+  white,
+  wheat,
+  italianHerbandCheese,
+  heartyItalian,
+  multigrain,
+  flatbread
+}
+
 class _OrderScreenState extends State<OrderScreen> {
   int _quantity = 0;
   String _itemType = '6 inch';
+  String _breadName = 'white';
+
   void _increaseQuantity() {
     if (_quantity < widget.maxQuantity) {
       // Methods are typically private (_increaseQuantity, _decreaseQuantity) in Flutter to manage internal state.
@@ -65,10 +76,10 @@ class _OrderScreenState extends State<OrderScreen> {
   void _makeFootLong() {
     setState(() => _itemType = 'Footlong');
   }
+
   void _makeSixInch() {
     setState(() => _itemType = 'Six inch');
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -100,23 +111,42 @@ class _OrderScreenState extends State<OrderScreen> {
                   onPressed: _quantity > 0 ? _decreaseQuantity : null,
                   child: const Text('Remove'),
                 ),
-                
               ],
             ),
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [Text('What Type of Sandwich do you want')]),
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [Text('What Type of Sandwich do you want')]),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 OutlinedButton(
                     onPressed: _makeFootLong, child: const Text('Footlong')),
-              OutlinedButton(
-                    onPressed: _makeSixInch, child: const Text('Six inch'))],
-            )
+                OutlinedButton(
+                    onPressed: _makeSixInch, child: const Text('Six inch'))
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                DropdownButton<BreadType>(
+                  value: BreadType.white, // Initial value
+                  items: BreadType.values.map((BreadType breadType) {
+                    return DropdownMenuItem<BreadType>(
+                      value: breadType, 
+                      child: Text(breadType.toString()),
+                    );
+                  }).toList(),
+                  onChanged: (BreadType? newValue) {
+                    setState(() {_breadName = newValue.toString();});
+                  },
+
+                  },
+                ),
+              ],
+            ),
           ],
         ),
       ),
