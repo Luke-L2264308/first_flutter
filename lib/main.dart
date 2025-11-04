@@ -16,6 +16,24 @@ class App extends StatelessWidget {
   }
 }
 
+class StylisedButton extends StatelessWidget{
+  const StylisedButton({super.key, this.onPressed, this.child});
+  final VoidCallback? onPressed;
+  final Widget? child;
+  
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.red,
+        foregroundColor: Colors.white,
+      )
+      ,child: child,
+    );
+  }
+}
+
 class OrderScreen extends StatefulWidget {
   final int maxQuantity;
 
@@ -24,21 +42,22 @@ class OrderScreen extends StatefulWidget {
   @override
   State<OrderScreen> createState() {
     return _OrderScreenState();
+    
   }
 }
 
 class _OrderScreenState extends State<OrderScreen> {
   int _quantity = 0;
   void _increaseQuantity() {
-    if (_quantity < widget.maxQuantity) {
+    if (_quantity < widget.maxQuantity) { // Methods are typically private (_increaseQuantity, _decreaseQuantity) in Flutter to manage internal state.
       setState(() => _quantity++);
     }
   }
 
   void _decreaseQuantity() {
-    if (_quantity > 0) {
+    if (_quantity > 0) { // To access them outside the class, you would need to make them public (remove the leading underscore).
       setState(() => _quantity--);
-    }
+    } // However, a more idiomatic Flutter approach is to expose callbacks or use state management solutions for interaction between widgets.
   }
 
   @override
@@ -58,12 +77,15 @@ class _OrderScreenState extends State<OrderScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  onPressed: () => _increaseQuantity(),
-                  child: const Text('Add'),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: StylisedButton(
+                    onPressed: _increaseQuantity,
+                    child: const Text('Add'),
+                  ),
                 ),
-                ElevatedButton(
-                  onPressed: () => _decreaseQuantity(),
+                StylisedButton(
+                  onPressed: _decreaseQuantity,
                   child: const Text('Remove'),
                 ),
               ],
