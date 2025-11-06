@@ -17,20 +17,19 @@ class App extends StatelessWidget {
 }
 
 class StylisedButton extends StatelessWidget {
-  const StylisedButton({super.key, this.onPressed, this.child});
+  const StylisedButton({super.key, this.onPressed, this.text, this.icon});
   final VoidCallback? onPressed;
-  final Widget? child;
-
+  final Widget? text;
+  final Widget? icon;
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
+    return ElevatedButton.icon(
+      onPressed: onPressed, icon: icon ,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.red,
-        foregroundColor: Colors.white,
-      ),
-      child: child,
-    );
+        foregroundColor: Colors.white, 
+      ), label: text!,
+          );
   }
 }
 
@@ -93,12 +92,14 @@ class _OrderScreenState extends State<OrderScreen> {
                     onPressed: _quantity < widget.maxQuantity
                         ? _increaseQuantity
                         : null,
-                    child: const Text('Add'),
+                    text: const Text('Add'),
+                    icon: Image.asset('assets/images/add-icon-transparent-23.jpg'),
                   ),
                 ),
                 StylisedButton(
                   onPressed: _quantity > 0 ? _decreaseQuantity : null,
-                  child: const Text('Remove'),
+                  text: const Text('Remove'),
+                  icon: Image.asset('assets/images/subtraction-vector-icon-isolated-transparent-background-subt-transparency-concept-can-be-used-web-mobile-127331674.webp'),
                 ),
                 
               ],
