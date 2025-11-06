@@ -47,7 +47,7 @@ class OrderScreen extends StatefulWidget {
 
 class _OrderScreenState extends State<OrderScreen> {
   int _quantity = 0;
-  String _itemType = '6 inch';
+  String _itemType = 'Six inch';
   void _increaseQuantity() {
     if (_quantity < widget.maxQuantity) {
       // Methods are typically private (_increaseQuantity, _decreaseQuantity) in Flutter to manage internal state.
