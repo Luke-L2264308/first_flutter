@@ -24,7 +24,15 @@ class StylisedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
-      onPressed: onPressed, icon: icon ,
+      onPressed: onPressed,
+      icon: SizedBox(
+        width: 20,
+        height: 20,
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: icon ?? const SizedBox.shrink(),
+        ),
+      ),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.red,
         foregroundColor: Colors.white, 
