@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'views/app_styles.dart';
+import 'repositories/order_repository.dart';
+
+enum BreadType { white, wheat, wholemeal }
 
 void main() {
   // runApp(const MyApp());
@@ -18,10 +21,17 @@ class App extends StatelessWidget {
 }
 
 class StylisedButton extends StatelessWidget {
-  const StylisedButton({super.key, this.onPressed, this.text, this.icon});
+  const StylisedButton({
+    super.key,
+    this.onPressed,
+    this.text,
+    this.icon,
+    this.backgroundColor = Colors.red,
+  });
   final VoidCallback? onPressed;
   final Widget? text;
   final Widget? icon;
+  final Color? backgroundColor;
   @override
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
@@ -35,10 +45,11 @@ class StylisedButton extends StatelessWidget {
         ),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.red,
-        foregroundColor: Colors.white, 
-      ), label: text!,
-          );
+        backgroundColor: backgroundColor,
+        foregroundColor: Colors.white,
+      ),
+      label: text!,
+    );
   }
 }
 
@@ -54,79 +65,144 @@ class OrderScreen extends StatefulWidget {
 }
 
 class _OrderScreenState extends State<OrderScreen> {
-  int _quantity = 0;
-  String _itemType = 'Six inch';
-  void _increaseQuantity() {
-    if (_quantity < widget.maxQuantity) {
-      // Methods are typically private (_increaseQuantity, _decreaseQuantity) in Flutter to manage internal state.
-      setState(() => _quantity++);
+  late final OrderRepository _orderRepository;
+  final TextEditingController _notesController = TextEditingController();
+  bool _isFootlong = true;
+  BreadType _selectedBreadType = BreadType.white;
+
+  @override
+  void initState() {
+    super.initState();
+    _orderRepository = OrderRepository(maxQuantity: widget.maxQuantity);
+    _notesController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  VoidCallback? _getIncreaseCallback() {
+    if (_orderRepository.canIncrement) {
+      return () => setState(_orderRepository.increment);
+    }
+    return null;
+  }
+
+  VoidCallback? _getDecreaseCallback() {
+    if (_orderRepository.canDecrement) {
+      return () => setState(_orderRepository.decrement);
+    }
+    return null;
+  }
+
+  void _onSandwichTypeChanged(bool value) {
+    setState(() => _isFootlong = value);
+  }
+
+  void _onBreadTypeSelected(BreadType? value) {
+    if (value != null) {
+      setState(() => _selectedBreadType = value);
     }
   }
 
-  void _decreaseQuantity() {
-    if (_quantity > 0) {
-      // To access them outside the class, you would need to make them public (remove the leading underscore).
-      setState(() => _quantity--);
-    } // However, a more idiomatic Flutter approach is to expose callbacks or use state management solutions for interaction between widgets.
+  List<DropdownMenuEntry<BreadType>> _buildDropdownEntries() {
+    List<DropdownMenuEntry<BreadType>> entries = [];
+    for (BreadType bread in BreadType.values) {
+      DropdownMenuEntry<BreadType> newEntry = DropdownMenuEntry<BreadType>(
+        value: bread,
+        label: bread.name,
+      );
+      entries.add(newEntry);
+    }
+    return entries;
   }
-
-  void _makeFootLong() {
-    setState(() => _itemType = 'Footlong');
-  }
-  void _makeSixInch() {
-    setState(() => _itemType = 'Six inch');
-  }
-
 
   @override
   Widget build(BuildContext context) {
+    String sandwichType = 'footlong';
+    if (!_isFootlong) {
+      sandwichType = 'six-inch';
+    }
+
+    String noteForDisplay;
+    if (_notesController.text.isEmpty) {
+      noteForDisplay = 'No notes added.';
+    } else {
+      noteForDisplay = _notesController.text;
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sandwich Counter',style: heading1,),
+        title: const Text(
+          'Sandwich Counter',
+          style: heading1,
+        ),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             OrderItemDisplay(
-              _quantity,
-              _itemType,
+              quantity: _orderRepository.quantity,
+              itemType: sandwichType,
+              breadType: _selectedBreadType,
+              orderNote: noteForDisplay,
             ),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: StylisedButton(
-                    onPressed: _quantity < widget.maxQuantity
-                        ? _increaseQuantity
-                        : null,
-                    text: const Text('Add'),
-                    icon: Image.asset('assets/images/add-icon-transparent-23.jpg'),
-                  ),
+                const Text('six-inch', style: normalText),
+                Switch(
+                  value: _isFootlong,
+                  onChanged: _onSandwichTypeChanged,
                 ),
-                StylisedButton(
-                  onPressed: _quantity > 0 ? _decreaseQuantity : null,
-                  text: const Text('Remove'),
-                  icon: Image.asset('assets/images/subtraction-vector-icon-isolated-transparent-background-subt-transparency-concept-can-be-used-web-mobile-127331674.webp'),
-                ),
-                
+                const Text('footlong', style: normalText),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [Text('What Type of Sandwich do you want')]),
+            const SizedBox(height: 10),
+            DropdownMenu<BreadType>(
+              textStyle: normalText,
+              initialSelection: _selectedBreadType,
+              onSelected: _onBreadTypeSelected,
+              dropdownMenuEntries: _buildDropdownEntries(),
             ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(40.0),
+              child: TextField(
+                key: const Key('notes_textfield'),
+                controller: _notesController,
+                decoration: const InputDecoration(
+                  labelText: 'Add a note (e.g., no onions)',
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                OutlinedButton(
-                    onPressed: _makeFootLong, child: const Text('Footlong',style: normalText,)),
-              OutlinedButton(
-                    onPressed: _makeSixInch, child: const Text('Six inch',style: normalText,))],
-            )
+                StylisedButton(
+                  onPressed: _getIncreaseCallback(),
+                  icon:
+                      Image.asset('assets/images/add-icon-transparent-23.jpg'),
+                  text: const Text('Add'),
+                  backgroundColor: Colors.green,
+                ),
+                const SizedBox(width: 8),
+                StylisedButton(
+                  onPressed: _getDecreaseCallback(),
+                  icon: Image.asset(
+                      'assets/images/subtraction-vector-icon-isolated-transparent-background-subt-transparency-concept-can-be-used-web-mobile-127331674.webp'),
+                  text: const Text('Remove'),
+                  
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -135,15 +211,19 @@ class _OrderScreenState extends State<OrderScreen> {
 }
 
 class OrderItemDisplay extends StatelessWidget {
-  final String itemType;
-  final int quantity;
+  final int? quantity;
+  final String? itemType;
+  final BreadType? breadType;
+  final String? orderNote;
 
-  const OrderItemDisplay(this.quantity, this.itemType, {super.key});
+  const OrderItemDisplay(
+      {this.quantity, this.itemType, this.breadType, this.orderNote,
+      super.key});
 
   @override
   Widget build(BuildContext context) {
     return Text(
         style: TextStyle(color: Colors.black, fontSize: 20),
-        '$quantity $itemType sandwich(es): ${'🥪' * quantity}');
+        '$quantity $itemType sandwich(es): ${'🥪' * quantity!}');
   }
 }
