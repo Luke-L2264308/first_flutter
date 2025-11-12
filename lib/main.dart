@@ -211,19 +211,36 @@ class _OrderScreenState extends State<OrderScreen> {
 }
 
 class OrderItemDisplay extends StatelessWidget {
-  final int? quantity;
-  final String? itemType;
-  final BreadType? breadType;
-  final String? orderNote;
+  final int quantity;
+  final String itemType;
+  final BreadType breadType;
+  final String orderNote;
 
-  const OrderItemDisplay(
-      {this.quantity, this.itemType, this.breadType, this.orderNote,
-      super.key});
+  const OrderItemDisplay({
+    super.key,
+    required this.quantity,
+    required this.itemType,
+    required this.breadType,
+    required this.orderNote,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-        style: TextStyle(color: Colors.black, fontSize: 20),
-        '$quantity $itemType sandwich(es): ${'🥪' * quantity!}');
+    String displayText =
+        '$quantity ${breadType.name} $itemType sandwich(es): ${'🥪' * quantity}';
+
+    return Column(
+      children: [
+        Text(
+          displayText,
+          style: normalText,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Note: $orderNote',
+          style: normalText,
+        ),
+      ],
+    );
   }
 }
