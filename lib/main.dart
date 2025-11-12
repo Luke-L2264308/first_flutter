@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_styles.dart';
 
 void main() {
   // runApp(const MyApp());
@@ -81,7 +82,7 @@ class _OrderScreenState extends State<OrderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sandwich Counter'),
+        title: const Text('Sandwich Counter',style: heading1,),
       ),
       body: Center(
         child: Column(
@@ -122,9 +123,9 @@ class _OrderScreenState extends State<OrderScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 OutlinedButton(
-                    onPressed: _makeFootLong, child: const Text('Footlong')),
+                    onPressed: _makeFootLong, child: const Text('Footlong',style: normalText,)),
               OutlinedButton(
-                    onPressed: _makeSixInch, child: const Text('Six inch'))],
+                    onPressed: _makeSixInch, child: const Text('Six inch',style: normalText,))],
             )
           ],
         ),
