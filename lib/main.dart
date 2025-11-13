@@ -242,8 +242,10 @@ class OrderItemDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String toastText = isToasted ? 'toasted' : 'untoasted';
+    final pricingRepository = PricingRepository(isFootlong: itemType == itemType, quantity: quantity);
+    double totalPrice = pricingRepository.totalPrice;
     String displayText =
-        '$quantity ${breadType.name} $toastText $itemType sandwich(es): ${'🥪' * quantity}';
+        '$quantity ${breadType.name} $toastText $itemType sandwich(es): ${'🥪' * quantity} (\£${totalPrice.toStringAsFixed(2)})';
 
     return Column(
       children: [
