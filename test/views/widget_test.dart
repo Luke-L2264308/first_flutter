@@ -18,6 +18,13 @@ void main() {
       expect(find.text('Sandwich Counter'), findsOneWidget);
     });
 
+    testWidgets('switches between six inch and footlong when switch pressed',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(const App());
+      await tester.tap(find.byType(Switch));
+      await tester.pump();
+      expect(find.textContaining('six-inch sandwich'), findsOneWidget);
+    });
     testWidgets('increments quantity when Add is tapped',
         (WidgetTester tester) async {
       await tester.pumpWidget(const App());
