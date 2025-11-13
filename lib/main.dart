@@ -245,7 +245,7 @@ class OrderItemDisplay extends StatelessWidget {
     final pricingRepository = PricingRepository(isFootlong: itemType == itemType, quantity: quantity);
     double totalPrice = pricingRepository.totalPrice;
     String displayText =
-        '$quantity ${breadType.name} $toastText $itemType sandwich(es): ${'🥪' * quantity} (\£${totalPrice.toStringAsFixed(2)})';
+        '$quantity ${breadType.name} $toastText $itemType sandwich(es): ${'🥪' * quantity} (£${totalPrice.toStringAsFixed(2)})';
 
     return Column(
       children: [
