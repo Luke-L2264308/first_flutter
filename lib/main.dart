@@ -67,6 +67,7 @@ class OrderScreen extends StatefulWidget {
 class _OrderScreenState extends State<OrderScreen> {
   late final OrderRepository _orderRepository;
   final TextEditingController _notesController = TextEditingController();
+  bool _isToasted = false;
   bool _isFootlong = true;
   BreadType _selectedBreadType = BreadType.white;
 
@@ -151,6 +152,7 @@ class _OrderScreenState extends State<OrderScreen> {
               itemType: sandwichType,
               breadType: _selectedBreadType,
               orderNote: noteForDisplay,
+              isToasted: _isToasted,
             ),
             const SizedBox(height: 20),
             Row(
@@ -159,9 +161,22 @@ class _OrderScreenState extends State<OrderScreen> {
                 const Text('six-inch', style: normalText),
                 Switch(
                   value: _isFootlong,
-                  onChanged: _onSandwichTypeChanged,
+                  onChanged: _onSandwichTypeChanged, key: const Key('sandwich_type_switch'),
                 ),
                 const Text('footlong', style: normalText),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('untoasted', style: normalText),
+                Switch(
+                  value: _isToasted,
+                  onChanged: (value) {
+                    setState(() => _isToasted = value);
+                  }, key: const Key('toasted_switch'),
+                ),
+                const Text('toasted', style: normalText),
               ],
             ),
             const SizedBox(height: 10),
@@ -199,7 +214,6 @@ class _OrderScreenState extends State<OrderScreen> {
                   icon: Image.asset(
                       'assets/images/subtraction-vector-icon-isolated-transparent-background-subt-transparency-concept-can-be-used-web-mobile-127331674.webp'),
                   text: const Text('Remove'),
-                  
                 ),
               ],
             ),
@@ -215,19 +229,21 @@ class OrderItemDisplay extends StatelessWidget {
   final String itemType;
   final BreadType breadType;
   final String orderNote;
-
+  final bool isToasted;
   const OrderItemDisplay({
     super.key,
     required this.quantity,
     required this.itemType,
     required this.breadType,
     required this.orderNote,
+    required this.isToasted
   });
 
   @override
   Widget build(BuildContext context) {
+    final String toastText = isToasted ? 'toasted' : 'untoasted';
     String displayText =
-        '$quantity ${breadType.name} $itemType sandwich(es): ${'🥪' * quantity}';
+        '$quantity ${breadType.name} $toastText $itemType sandwich(es): ${'🥪' * quantity}';
 
     return Column(
       children: [
