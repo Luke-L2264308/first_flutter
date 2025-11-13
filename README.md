@@ -42,13 +42,7 @@ This app is a learning/demo project that provides a simple UI for composing sand
 
 ## Screenshots
 
-Add screenshots or GIFs to `assets/` and reference them here. Example:
 
-![Order screen placeholder](assets/images/add-icon-transparent-23.jpg)
-
-(Replace with actual screenshots captured from a running emulator/device.)
-
----
 
 ## Requirements
 
