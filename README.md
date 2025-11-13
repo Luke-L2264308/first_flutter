@@ -64,7 +64,7 @@ flutter doctor
 
 1. Clone the repository:
 ```powershell
-git clone <https://github.com/Luke-L2264308/first_flutter/tree/working> d:\flutter\first_flutter
+git clone https://github.com/Luke-L2264308/first_flutter.git d:\flutter\first_flutter
 cd d:\flutter\first_flutter
 ```
 
