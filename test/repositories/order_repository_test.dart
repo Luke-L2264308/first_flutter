@@ -47,7 +47,7 @@ void main() {
     });
 
     test('calculates total price for non-footlong (six-inch) sandwiches', () {
-      final repo = PricingRepository(isFootlong: 'footlong', quantity: 3);
+      final repo = PricingRepository(isFootlong: 'six-inch', quantity: 3);
       // six-inch unit price = 7.0
       expect(repo.totalPrice, equals(21.0));
     });
