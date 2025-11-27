@@ -41,14 +41,14 @@ void main() {
     await tester.pumpWidget(const App());
 
     // Open sandwich type dropdown and select 'Tuna Melt'
-    await tester.tap(find.text('Sandwich Type'));
+    await tester.tap(find.text('Sandwich Type').first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Tuna Melt').last);
     await tester.pumpAndSettle();
     expect(find.text('Tuna Melt'), findsWidgets);
 
     // Open bread type dropdown and select 'wheat'
-    await tester.tap(find.text('Bread Type'));
+    await tester.tap(find.text('Bread Type').first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('wheat').last);
     await tester.pumpAndSettle();
