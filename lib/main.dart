@@ -217,7 +217,7 @@ class _OrderScreenState extends State<OrderScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(
-                height: 300,
+                height: 220,
                 child: Image.asset(
                   _getCurrentImagePath(),
                   fit: BoxFit.cover,
@@ -293,6 +293,66 @@ class _OrderScreenState extends State<OrderScreen> {
                     style: normalText,
                   ),
                 ),
+              const SizedBox(height: 20),
+
+              // Persistent cart summary
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Container(
+                  key: const Key('cart_summary'),
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Items: ${_cart.itemCount}', style: normalText),
+                      Text(
+                          'Total: \$${_cart.calculateTotalPrice().toStringAsFixed(2)}',
+                          style: heading1),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Persistent cart items list
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Container(
+                  key: const Key('cart_items_container'),
+                  child: _cart.isEmpty
+                      ? const Text('Cart is empty', style: normalText)
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: _cart.items.map((item) {
+                            final sandwich = item.sandwich;
+                            final sizeText =
+                                sandwich.isFootlong ? 'footlong' : 'six-inch';
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 6.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                        '${item.quantity}x ${sandwich.name} (${sandwich.breadType.name}, $sizeText)',
+                                        style: normalText),
+                                  ),
+                                  Text(
+                                      '\$${item.totalPrice.toStringAsFixed(2)}',
+                                      style: normalText),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                ),
+              ),
               const SizedBox(height: 20),
             ],
           ),

@@ -67,4 +67,20 @@ void main() {
     // if no exception, test passes for button interaction
     expect(find.widgetWithText(StylisedButton, 'Add to Cart'), findsOneWidget);
   });
+
+  testWidgets('shows confirmation message after Add to Cart', (WidgetTester tester) async {
+    await tester.pumpWidget(const App());
+
+    // Tap Add to Cart
+    final addToCart = find.widgetWithText(StylisedButton, 'Add to Cart');
+    expect(addToCart, findsOneWidget);
+    await tester.tap(addToCart);
+    await tester.pump();
+
+    // Expect the confirmation message to appear in the UI
+    expect(find.textContaining('Added 1 footlong Veggie Delight sandwich(es)'), findsOneWidget);
+    expect(find.textContaining('to cart'), findsOneWidget);
+  });
+
+
 }
