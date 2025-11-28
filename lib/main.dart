@@ -284,16 +284,8 @@ class _OrderScreenState extends State<OrderScreen> {
                 text: const Text('Add to Cart'),
                 backgroundColor: Colors.green,
               ),
-              const SizedBox(height: 12),
-              if (_confirmationMessage != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    _confirmationMessage!,
-                    style: normalText,
-                  ),
-                ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 32),
+              
 
               // Persistent cart summary
               Padding(
