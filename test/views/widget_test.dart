@@ -20,22 +20,31 @@ void main() {
     expect(find.textContaining('1'), findsOneWidget);
 
     // tap the + icon to increase
+    await tester
+        .ensureVisible(find.widgetWithIcon(IconButton, Icons.add).first);
+    await tester.pumpAndSettle();
     await tester.tap(find.widgetWithIcon(IconButton, Icons.add).first);
     await tester.pumpAndSettle();
     expect(find.textContaining('2'), findsOneWidget);
 
     // tap the - icon to decrease
+    await tester.ensureVisible(find.byIcon(Icons.remove).first);
+    await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.remove).first);
     await tester.pumpAndSettle();
     expect(find.textContaining('1'), findsOneWidget);
 
     // decrease to zero and ensure it doesn't go negative
+    await tester.ensureVisible(find.byIcon(Icons.remove).first);
+    await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.remove).first);
     await tester.pumpAndSettle();
-    expect(find.textContaining('0'), findsOneWidget);
+    expect(find.text('0'), findsOneWidget);
+    await tester.ensureVisible(find.byIcon(Icons.remove).first);
+    await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.remove).first);
     await tester.pumpAndSettle();
-    expect(find.textContaining('0'), findsOneWidget);
+    expect(find.text('0'), findsOneWidget);
   });
 
   testWidgets('select sandwich type and bread type via dropdowns',
@@ -44,6 +53,8 @@ void main() {
     await tester.pumpAndSettle();
 
     // Open sandwich type dropdown and select 'Tuna Melt'
+    await tester.ensureVisible(find.text('Sandwich Type').first);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Sandwich Type').first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Tuna Melt').last);
@@ -51,6 +62,8 @@ void main() {
     expect(find.text('Tuna Melt'), findsWidgets);
 
     // Open bread type dropdown and select 'wheat'
+    await tester.ensureVisible(find.text('Bread Type').first);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Bread Type').first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('wheat').last);
@@ -66,6 +79,9 @@ void main() {
     // Initially quantity is 1 so Add to Cart should be enabled (has text)
     expect(find.widgetWithText(StylisedButton, 'Add to Cart'), findsOneWidget);
     // Tap Add to Cart (no visible result, but should not throw)
+    await tester
+        .ensureVisible(find.widgetWithText(StylisedButton, 'Add to Cart'));
+    await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(StylisedButton, 'Add to Cart'));
     await tester.pumpAndSettle();
     // if no exception, test passes for button interaction
@@ -80,13 +96,35 @@ void main() {
     // Tap Add to Cart
     final addToCart = find.widgetWithText(StylisedButton, 'Add to Cart');
     expect(addToCart, findsOneWidget);
-    await tester.tap(addToCart);
+    await tester.ensureVisible(addToCart);
     await tester.pumpAndSettle();
+    await tester.tap(addToCart);
+    await tester.pump();
+    await tester
+        .pump(const Duration(milliseconds: 300)); // allow any animations
 
     // Expect the confirmation message to appear in the UI (match substrings)
-    expect(find.textContaining('Added 1'), findsOneWidget);
-    expect(find.textContaining('Veggie Delight'), findsOneWidget);
-    expect(find.textContaining('to cart'), findsOneWidget);
+    expect(find.byType(SnackBar), findsOneWidget);
+
+    expect(
+        find.descendant(
+            of: find.byType(SnackBar),
+            matching: find.textContaining('Added 1')),
+        findsOneWidget);
+    expect(
+      find.descendant(
+      of: find.byType(SnackBar),
+      matching: find.textContaining('Veggie Delight'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+      of: find.byType(SnackBar),
+      matching: find.textContaining('to cart'),
+      ),
+      findsOneWidget,
+    );
 
     // Persistent cart summary and items should reflect the addition
     expect(find.byKey(const Key('cart_summary')), findsOneWidget);
